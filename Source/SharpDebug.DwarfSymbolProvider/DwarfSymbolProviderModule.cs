@@ -1669,12 +1669,16 @@ namespace SharpDebug.DwarfSymbolProvider
 
                                 if (!string.IsNullOrEmpty(fullName) && symbol.Attributes.TryGetValue(DwarfAttribute.Location, out locationAttributeValue))
                                 {
-                                    Location location = DecodeLocation(locationAttributeValue);
-
-                                    if (location.Type == LocationType.AbsoluteAddress)
+                                    try
                                     {
-                                        globalVariables.TryAdd(fullName, symbol);
+                                        Location location = DecodeLocation(locationAttributeValue);
+
+                                        if (location.Type == LocationType.AbsoluteAddress)
+                                        {
+                                            globalVariables.TryAdd(fullName, symbol);
+                                        }
                                     }
+                                    catch {}
                                 }
                             }
                             else if (symbol.Tag == DwarfTag.Member && symbol.Attributes.ContainsKey(DwarfAttribute.External)
@@ -2825,12 +2829,16 @@ namespace SharpDebug.DwarfSymbolProvider
             {
                 if (symbol.Tag == DwarfTag.Variable && symbol.FullName == globalVariableName)
                 {
-                    Location location = DecodeLocation(symbol.Attributes[DwarfAttribute.Location]);
-
-                    if (location.Type == LocationType.AbsoluteAddress)
+                    try
                     {
-                        return true;
+                        Location location = DecodeLocation(symbol.Attributes[DwarfAttribute.Location]);
+
+                        if (location.Type == LocationType.AbsoluteAddress)
+                        {
+                            return true;
+                        }
                     }
+                    catch {}
                 }
                 else if (symbol.Tag == DwarfTag.Member && symbol.Attributes.ContainsKey(DwarfAttribute.External)
                     && symbol.Attributes[DwarfAttribute.External].Flag && symbol.FullName == globalVariableName)
@@ -2891,23 +2899,30 @@ namespace SharpDebug.DwarfSymbolProvider
         {
             DwarfAttributeValue typeAttributeValue;
 
-            if (!symbol.Attributes.TryGetValue(DwarfAttribute.Type, out typeAttributeValue))
+            try
             {
-                return null;
-            }
-
-            DwarfSymbol type = typeAttributeValue.Reference;
-
-            while (type.Tag == DwarfTag.Typedef || type.Tag == DwarfTag.ConstType || type.Tag == DwarfTag.VolatileType)
-            {
-                if (!type.Attributes.TryGetValue(DwarfAttribute.Type, out typeAttributeValue))
+                if (!symbol.Attributes.TryGetValue(DwarfAttribute.Type, out typeAttributeValue))
                 {
                     return null;
                 }
 
-                type = typeAttributeValue.Reference;
+                DwarfSymbol type = typeAttributeValue.Reference;
+
+                while (type.Tag == DwarfTag.Typedef || type.Tag == DwarfTag.ConstType || type.Tag == DwarfTag.VolatileType)
+                {
+                    if (!type.Attributes.TryGetValue(DwarfAttribute.Type, out typeAttributeValue))
+                    {
+                        return null;
+                    }
+
+                    type = typeAttributeValue.Reference;
+                }
+                return type;
             }
-            return type;
+            catch
+            {
+                return null;
+            }
         }
 
         /// <summary>
