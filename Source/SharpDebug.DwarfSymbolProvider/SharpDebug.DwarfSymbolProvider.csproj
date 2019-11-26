@@ -9,11 +9,11 @@
   <ItemGroup>
     <ProjectReference Include="$(EnlistmentRoot)\Source\SharpDebug.Engine\SharpDebug.Engine.csproj" />
     <ProjectReference Include="$(EnlistmentRoot)\Source\SharpDebug.CodeGen\SharpDebug.CodeGen.csproj" />
+    <ProjectReference Include="..\..\..\ElfSharp\ELFSharp\ELFSharp.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="CxxDemangler" Version="0.2.4.11" />
-    <PackageReference Include="ELFSharp" Version="2.1.1" />
     <PackageReference Include="System.Reflection.TypeExtensions" Version="4.4.0" />
   </ItemGroup>
 
