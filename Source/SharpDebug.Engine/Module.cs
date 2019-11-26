@@ -142,6 +142,32 @@ namespace SharpDebug
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="Module" /> class.
+        /// </summary>
+        /// <param name="path">The module path.</param>
+        /// <param name="address">The module address.</param>
+        /// <param name="_pointerSize">The module's native pointerSize.</param>
+        public Module(string path, ulong address = 0, uint _pointerSize = 8)
+        {
+            Address = address;
+            Process = default(Process);
+            Id = uint.MaxValue;
+            name = SimpleCache.Create(() => path);
+            imageName = SimpleCache.Create(() => path);
+            loadedImageName = SimpleCache.Create(() => path);
+            symbolFileName = SimpleCache.Create(() => path);
+            mappedImageName = SimpleCache.Create(() => path);
+            clrModule = null;
+            pointerSize = SimpleCache.Create(() => _pointerSize);
+            TypesByName = new DictionaryCache<string, CodeType>(GetTypeByName);
+            TypesById = new DictionaryCache<uint, CodeType>(GetTypeById);
+            ClrTypes = new DictionaryCache<IClrType, CodeType>(GetClrCodeType);
+            GlobalVariables = new DictionaryCache<string, Variable>(GetGlobalVariable);
+            UserTypeCastedGlobalVariables = Context.UserTypeMetadataCaches.CreateDictionaryCache<string, Variable>((name) => Process.CastVariableToUserType(GlobalVariables[name]));
+        }
+
+
+        /// <summary>
         /// Gets the array of all modules for the current process.
         /// </summary>
         public static Module[] All
