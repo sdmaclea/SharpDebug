@@ -209,13 +209,7 @@ namespace SharpDebug.DwarfSymbolProvider
         {
             Section<ulong> section;
 
-            if (address < sectionRegions.Value[0].LoadAddress)
-                section = elf.Sections.FirstOrDefault(s => s.LoadAddress <= address && s.LoadAddress + s.Size > address);
-            else
-            {
-                int sectionIndex = sectionRegionFinder.Value.Find(address);
-                section = sectionIndex >= 0 ? sectionRegions.Value[sectionIndex] : null;
-            }
+            section = elf.Sections.FirstOrDefault(s => s.LoadAddress <= address && s.LoadAddress + s.Size > address);
 
             if (section != null && section.Flags.HasFlag(SectionFlags.Allocatable))
                 return address - CodeSegmentOffset + LoadOffset;
