@@ -1630,12 +1630,6 @@ namespace SharpDebug.DwarfSymbolProvider
                             if (!string.IsNullOrEmpty(typeName))
                             {
                                 typeNameToType.TryAdd(typeName, symbol);
-                                typeNameToType.TryAdd(CleanSymbolNameNumbers(typeName), symbol);
-                                if (symbol.Tag != DwarfTag.Typedef)
-                                {
-                                    typeNameToType.TryAdd(GetTypeNameNicePrint(symbol, true), symbol);
-                                    typeNameToType.TryAdd(GetTypeNameNicePrint(symbol, false), symbol);
-                                }
                             }
 
                             // If it is pointer type, add it to collection
